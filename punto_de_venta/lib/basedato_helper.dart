@@ -188,13 +188,6 @@ class BasedatoHelper {
     return ventasMapeadas.values.toList();
   }
 
-  Future<int> eliminarVenta(int id) async {
-    final Database db = await initDB();
-    await db.delete("venta_productos", where: "venta_id = ?", whereArgs: [id]);
-    // Luego eliminar la venta
-    return await db.delete("ventas", where: "id = ?", whereArgs: [id]);
-  }
-
   Future<int> agregarVenta(Venta venta) async {
     final BasedatoHelper dbHelper = BasedatoHelper();
     final Database db = await initDB();
@@ -220,48 +213,6 @@ class BasedatoHelper {
     }
 
     return ventaId;
-  }
-
-  Future<int> actualizarVenta(Venta venta) async {
-    final Database db = await initDB();
-    try {
-      await db.update(
-        "ventas",
-        {"total": venta.total, "fecha": venta.fecha},
-        where: "id = ?",
-        whereArgs: [venta.id],
-      );
-      await db.delete(
-        "venta_productos",
-        where: "venta_id = ?",
-        whereArgs: [venta.id],
-      );
-
-      for (var producto in venta.productos) {
-        await db.insert("venta_productos", {
-          "venta_id": venta.id,
-          "producto_id": producto.productoId,
-          "cantidad": producto.cantidad,
-          "total": producto.total,
-        });
-      }
-
-      return venta.id!;
-    } catch (e) {
-      print("Error al actualizar la venta: $e");
-      return -1;
-    }
-  }
-
-  Future<int> finalizarVenta() async {
-    final Database db = await initDB();
-    try {
-      await db.delete("venta_productos");
-      return await db.delete("ventas");
-    } catch (e) {
-      print("Error al finalizar la venta: $e");
-      return -1;
-    }
   }
 
   Future<int> insertarProductoVenta(

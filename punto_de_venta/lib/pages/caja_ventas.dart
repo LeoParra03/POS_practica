@@ -70,6 +70,10 @@ class _CajaVentasState extends State<CajaVentas> {
   void eliminarProductoDeVenta(Venta ventaItem, ProductoVenta productoVenta) {
     setState(() {
       ventaItem.productos.remove(productoVenta);
+      ventaItem.total = ventaItem.productos.fold(
+        0.0,
+        (sum, p) => sum + p.total,
+      );
       if (ventaItem.productos.isEmpty) {
         ventasTemporales.remove(ventaItem);
       }
